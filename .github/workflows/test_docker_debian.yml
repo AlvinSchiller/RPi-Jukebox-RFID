@@ -22,6 +22,10 @@ jobs:
   run:
     name: ${{ matrix.debian_version_name }}
     secrets: inherit
+    permissions:
+      actions: write  # needed for cache cleanup. Reusable workflow can't elevate permissions so must be passed down
+      contents: read  # default
+      packages: read  # default
 
     strategy:
       fail-fast: false
