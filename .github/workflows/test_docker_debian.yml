@@ -22,6 +22,11 @@ jobs:
   # Build container and run tests
   run:
     name: ${{ matrix.debian_version_name }}
+    permissions:
+      actions: write  # needed for cache cleanup. Reusable workflow can't elevate permissions so must be passed down
+      contents: read  # default
+      packages: read  # default
+
     strategy:
       fail-fast: false
       matrix:

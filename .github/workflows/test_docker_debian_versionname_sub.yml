@@ -35,6 +35,12 @@ concurrency:
     group: ${{ inputs.cache_scope }}-${{ inputs.debian_version_name }}
     cancel-in-progress: true
 
+# default permissions
+permissions:
+  actions: none
+  contents: read
+  packages: read
+
 jobs:
 
   # Build container for test execution
@@ -153,7 +159,7 @@ jobs:
     - name: Cache Restore Docker Image
       uses: actions/cache/restore@v3
       with:
-        key: ${{  needs.build.outputs.cache_key }}
+        key: ${{ needs.build.outputs.cache_key }}
         path: ${{ needs.build.outputs.image_file_path }}
         fail-on-cache-miss: true
 
@@ -170,3 +176,34 @@ jobs:
         name: ${{ matrix.test_script }}
         args: |
           ./${{ matrix.test_script }}
+
+  # cleanup after test execution
+  cleanup:
+    # run always (on success, failure and cancallation of previous steps)
+    if: always()
+    needs: [build, test]
+    runs-on: ${{ inputs.runs_on }}
+    permissions:
+      actions: write  # needed for cache cleanup
+
+    steps:
+    # Lookup cached image file
+    - name: Cache Lookup Docker Image
+      id: restore-cache
+      uses: actions/cache/restore@v3
+      with:
+        key: ${{ needs.build.outputs.cache_key }}
+        path: ${{ needs.build.outputs.image_file_path }}
+        lookup-only: true
+        fail-on-cache-miss: true
+
+    # Remove cached image file
+    - name: Cache Clear Docker Image
+      if: steps.restore-cache.outputs.cache-hit == 'true'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPOSITORY: ${{ github.repository }}
+        CACHE_KEY: ${{ needs.build.outputs.cache_key }}
+      run: |
+        gh cache delete "${CACHE_KEY}" --repo "${REPOSITORY}"
+        echo "deleted cached key: '${CACHE_KEY}'"
