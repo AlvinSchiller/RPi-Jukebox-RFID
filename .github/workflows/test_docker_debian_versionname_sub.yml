@@ -197,7 +197,7 @@ jobs:
         lookup-only: true
         fail-on-cache-miss: true
 
-    # Remove cached image file
+    # Remove cached image file. as
     - name: Cache Clear Docker Image
       if: steps.restore-cache.outputs.cache-hit == 'true'
       env:
