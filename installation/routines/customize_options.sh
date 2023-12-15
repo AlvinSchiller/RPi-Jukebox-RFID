@@ -292,9 +292,15 @@ _option_webapp_devel_build() {
       clear_c
       print_c "--------------------- WEBAPP NODE ---------------------
 
-You are installing from a non-release branch.
-This means, you will need to build the web app locally.
-For that you'll need Node.
+You are not installing from an official branch.
+This means there is no matching prebuild web app bundle 
+available and you will need to build the web app locally. 
+Node needs to be installed to enable this.
+
+If you choose to not install Node, the latest available
+prebuild web app bundle for your version will be downloaded.
+This is possibly stale and could be not compatible.
+You have been warned.
 
 Do you want to install Node? [Y/n]"
       read -r response
@@ -332,8 +338,8 @@ _run_customize_options() {
   _option_samba
   _option_webapp
   if [[ $ENABLE_WEBAPP == true ]] ; then
-    _option_kiosk_mode
     _option_webapp_devel_build
+    _option_kiosk_mode
   fi
   # Bullseye is currently under active development and should be updated in any case.
   # Hence, removing the step below as it becomse mandatory

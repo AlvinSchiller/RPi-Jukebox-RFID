@@ -23,8 +23,8 @@ export ENABLE_WEBAPP_PROD_DOWNLOAD=true
 # n - setup rfid reader
 # n - setup samba
 # y - setup webapp
-# y - setup kiosk mode
 # - - install node (forced webapp download)
+# y - setup kiosk mode
 # n - reboot
 
 "${LOCAL_INSTALL_SCRIPT_PATH}/install-jukebox.sh" <<< 'y
