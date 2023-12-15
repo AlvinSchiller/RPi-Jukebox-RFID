@@ -3,13 +3,13 @@ name: Bundle Webapp and Release
 on:
   push:
     branches:
-      # change to future3/main and future3/develop
-      - 'future3/test/**'
+      - 'future3/main'
+      - 'future3/develop'
 
 jobs:
 
   build:
-    # change to MiczFlor
+    # TODO change to MiczFlor
     if: ${{ github.repository_owner == 'AlvinSchiller' }}
     runs-on: ubuntu-latest
 
