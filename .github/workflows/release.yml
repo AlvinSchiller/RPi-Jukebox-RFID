@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - 'main'
+      - 'master'
 
 jobs:
 
@@ -48,7 +48,7 @@ jobs:
             RELEASE_TYPE=none
           fi
 
-          if [ "$BRANCH_NAME" == 'main' -a "$RELEASE_TYPE" == 'release' ] ; then
+          if [ "$BRANCH_NAME" == 'master' -a "$RELEASE_TYPE" == 'release' ] ; then
             CHECK_ABORT=false
           else
             echo "::notice title=Abort due to not matching ${RELEASE_TYPE} version for branch!::'${VERSION}' on '${BRANCH_NAME}'"
