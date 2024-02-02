@@ -110,23 +110,29 @@ _check_existing_installation() {
     if [[ -e "${INSTALLATION_PATH}" ]]; then
         print_c "############## EXISTING INSTALLATION FOUND ##############
 
-If you want to keep your settings, continue with 'y'
-- the installation folder will be moved to '${INSTALLATION_PATH_PREV}' as backup
-- the current install configuration will be used to perform the installation
-- your './shared/' folder will be copied to the new installation
+If you want to keep your settings
+- the installation folder will be moved as backup to
+  '${INSTALLATION_PATH_PREV}'
+- the current install configuration will be used
+- your './shared/' folder will be copied from the backup
 - any other file changes have to be copied manually
 
-Else you will be prompted with the installation options
-- the installation folder will be moved to '${INSTALLATION_PATH_PREV}' as backup
-- NOTE: previously installed features will currently not be removed!
+else
+- the installation folder will be moved as backup to
+  '${INSTALLATION_PATH_PREV}'
+- you will be prompted to choose installation options
+- NOTE: previously installed features will currently
+        not be removed!
 
-Keep your current settings? [y/N]"
+Press CTRL+C to exit now, without performing any changes.
+
+Keep your current settings? [Y/n]"
         read -r response
         case "$response" in
-            [yY][eE][sS]|[yY])
-                USE_PREV_INSTALL_CONFIG=true
+            [nN][oO]|[nN])
                 ;;
             *)
+                USE_PREV_INSTALL_CONFIG=true
                 ;;
         esac
         log "USE_PREV_INSTALL_CONFIG=${USE_PREV_INSTALL_CONFIG}"
