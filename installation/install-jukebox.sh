@@ -28,6 +28,9 @@ INSTALLATION_PATH="${HOME_PATH}/${GIT_REPO_NAME}"
 INSTALL_ID=$(date +%s)
 INSTALLATION_LOGFILE="${HOME_PATH}/INSTALL-${INSTALL_ID}.log"
 
+INSTALLATION_PATH_PREV="${HOME_PATH}/${GIT_REPO_NAME}-${INSTALL_ID}"
+USE_PREV_INSTALL_CONFIG=false
+
 # Manipulate file descriptor for logging
 _setup_logging(){
     if [ "$CI_RUNNING" == "true" ]; then
@@ -103,6 +106,47 @@ _check_os_type() {
   fi
 }
 
+_check_existing_installation() {
+    if [[ -e "${INSTALLATION_PATH}" ]]; then
+        print_c "############## EXISTING INSTALLATION FOUND ##############
+
+If you want to keep your settings, continue with 'y'
+- the installation folder will be moved to '${INSTALLATION_PATH_PREV}' as backup
+- the current install configuration will be used to perform the installation
+- your './shared/' folder will be copied to the new installation
+- any other file changes have to be copied manually
+
+Else you will be prompted with the installation options
+- the installation folder will be moved to '${INSTALLATION_PATH_PREV}' as backup
+- NOTE: previously installed features will currently not be removed!
+
+Keep your current settings? [y/N]"
+        read -r response
+        case "$response" in
+            [yY][eE][sS]|[yY])
+                if [[ -f "${INSTALL_CONFIG_CURRENT}" ]]; then
+                    USE_PREV_INSTALL_CONFIG=true
+                else
+                    print_lc "ERROR: No '${INSTALL_CONFIG_FILENAME} found. Can't use configuration."
+                    print_lc "       Choosing installation options required!"
+                fi
+                ;;
+            *)
+                ;;
+        esac
+        log "USE_PREV_INSTALL_CONFIG=${USE_PREV_INSTALL_CONFIG}"
+        mv -f "$INSTALLATION_PATH" "$INSTALLATION_PATH_PREV"
+        log "Moved existing installation to '${INSTALLATION_PATH_PREV}'"
+    fi
+}
+
+_load_installation_config() {
+    if [[ "${USE_PREV_INSTALL_CONFIG}" == true ]]; then
+        cp -f "${INSTALLATION_PATH_PREV}/${INSTALL_CONFIG_FILENAME}" "${INSTALL_CONFIG_CURRENT}"
+        source "${INSTALL_CONFIG_CURRENT}" || exit_on_error
+    fi
+}
+
 _download_jukebox_source() {
   log "#########################################################"
   print_c "Downloading Phoniebox software from Github ..."
@@ -148,9 +192,11 @@ _check_os_type
 log "Current User: $CURRENT_USER"
 log "User home dir: $HOME_PATH"
 
+_check_existing_installation
 _download_jukebox_source
 cd "${INSTALLATION_PATH}" || exit_on_error "ERROR: Changing to install dir failed."
 _load_sources
+_load_installation_config
 
 welcome
 run_with_timer install

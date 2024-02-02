@@ -11,6 +11,9 @@
 # Application
 /src/cli_client/pbc
 
+# Install configuration
+/Install.conf
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

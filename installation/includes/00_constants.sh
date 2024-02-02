@@ -1,11 +1,14 @@
 RPI_BOOT_CONFIG_FILE="/boot/config.txt"
 RPI_BOOT_CMDLINE_FILE="/boot/cmdline.txt"
-SHARED_PATH="${INSTALLATION_PATH}/shared"
+SHARED_FOLDERNAME="shared"
+SHARED_PATH="${INSTALLATION_PATH}/${SHARED_FOLDERNAME}"
 SETTINGS_PATH="${SHARED_PATH}/settings"
 SYSTEMD_USR_PATH="/usr/lib/systemd/user"
 VIRTUAL_ENV="${INSTALLATION_PATH}/.venv"
 # Do not change this directory! It must match MPDs expectation where to find the user configuration
 MPD_CONF_PATH="${HOME}/.config/mpd/mpd.conf"
+INSTALL_CONFIG_FILENAME="Install.conf"
+INSTALL_CONFIG_CURRENT="${INSTALLATION_PATH}/${INSTALL_CONFIG_FILENAME}"
 
 # The default upstream user, release branch, and develop branch
 # These are used to prepare the repo for developers

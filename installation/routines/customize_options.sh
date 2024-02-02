@@ -330,6 +330,34 @@ Do you want to build the Web App? [Y/n]"
   log "ENABLE_WEBAPP_PROD_DOWNLOAD=${ENABLE_WEBAPP_PROD_DOWNLOAD}"
 }
 
+_write_install_config(){
+    echo "
+BUILD_LIBZMQ_WITH_DRAFTS_ON_DEVICE=${BUILD_LIBZMQ_WITH_DRAFTS_ON_DEVICE}
+ENABLE_STATIC_IP=${ENABLE_STATIC_IP}
+CURRENT_ROUTE=${CURRENT_ROUTE}
+CURRENT_GATEWAY=${CURRENT_GATEWAY}
+CURRENT_IP_ADDRESS=${CURRENT_IP_ADDRESS}
+DISABLE_IPv6=${DISABLE_IPv6}
+ENABLE_AUTOHOTSPOT=${ENABLE_AUTOHOTSPOT}
+AUTOHOTSPOT_PASSWORD=${AUTOHOTSPOT_PASSWORD}
+DISABLE_BLUETOOTH=${DISABLE_BLUETOOTH}
+DISABLE_SSH_QOS=${DISABLE_SSH_QOS}
+DISABLE_BOOT_SCREEN=${DISABLE_BOOT_SCREEN}
+DISABLE_BOOT_LOGS_PRINT=${DISABLE_BOOT_LOGS_PRINT}
+SETUP_MPD=${SETUP_MPD}
+ENABLE_MPD_OVERWRITE_INSTALL=true
+UPDATE_RASPI_OS=${UPDATE_RASPI_OS}
+ENABLE_RFID_READER=false
+ENABLE_SAMBA=${ENABLE_SAMBA}
+ENABLE_WEBAPP=${ENABLE_WEBAPP}
+ENABLE_KIOSK_MODE=${ENABLE_KIOSK_MODE}
+DISABLE_ONBOARD_AUDIO=${DISABLE_ONBOARD_AUDIO}
+DISABLE_ONBOARD_AUDIO_BACKUP=${DISABLE_ONBOARD_AUDIO_BACKUP}
+GIT_USE_SSH=${GIT_USE_SSH}
+ENABLE_WEBAPP_PROD_DOWNLOAD=${ENABLE_WEBAPP_PROD_DOWNLOAD}
+" > "${INSTALL_CONFIG_CURRENT}"
+}
+
 _run_customize_options() {
   _option_ipv6
   _option_static_ip
@@ -347,8 +375,11 @@ _run_customize_options() {
   # Bullseye is currently under active development and should be updated in any case.
   # Hence, removing the step below as it becomse mandatory
   # _options_update_raspi_os
+  _write_install_config
 }
 
 customize_options() {
-    run_with_log_frame _run_customize_options "Customize Options"
+    if [[ ! "${USE_PREV_INSTALL_CONFIG}" == true ]]; then
+        run_with_log_frame _run_customize_options "Customize Options"
+    fi
 }
