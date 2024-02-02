@@ -33,7 +33,7 @@ Do you want to start the installation? [Y/n]"
   read -r response
   case "$response" in
     [nN][oO]|[nN])
-      exit
+      exit_on_abort
       ;;
     *)
       print_c "Starting installation

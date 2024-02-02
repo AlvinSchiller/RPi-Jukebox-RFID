@@ -1,7 +1,8 @@
 _write_prev_shared() {
     if [[ "${USE_PREV_INSTALL_CONFIG}" == true ]]; then
+        print_lc "  Restore 'shared' folder of previous installation"
         rm -rf "${SHARED_PATH}"
-        cp -rf "${INSTALLATION_PATH_PREV}/${SHARED_FOLDERNAME}" "${SHARED_PATH}"
+        cp -rf "${INSTALLATION_PATH_BACKUP}/${SHARED_FOLDERNAME}" "${SHARED_PATH}"
     fi
 }
 
@@ -39,8 +40,8 @@ _setup_login_message() {
 
 _run_setup_postinstall() {
     _setup_login_message
-    _write_install_config
     _write_prev_shared
+    _write_install_config
 }
 
 setup_postinstall() {

@@ -28,7 +28,7 @@ INSTALLATION_PATH="${HOME_PATH}/${GIT_REPO_NAME}"
 INSTALL_ID=$(date +%s)
 INSTALLATION_LOGFILE="${HOME_PATH}/INSTALL-${INSTALL_ID}.log"
 
-INSTALLATION_PATH_PREV="${HOME_PATH}/${GIT_REPO_NAME}-${INSTALL_ID}"
+INSTALLATION_PATH_BACKUP="${HOME_PATH}/${GIT_REPO_NAME}-${INSTALL_ID}"
 USE_PREV_INSTALL_CONFIG=false
 
 # Manipulate file descriptor for logging
@@ -69,6 +69,19 @@ clear_c() {
   clear 1>&3
 }
 
+exit_on_abort () {
+    log "Abort!"
+
+    if [[ -e "${INSTALLATION_PATH_BACKUP}" ]]; then
+        if [[ -e "${INSTALLATION_PATH}" ]]; then
+            mv -f "$INSTALLATION_PATH" "$INSTALLATION_PATH_BACKUP"-failed
+        fi
+        mv -f "$INSTALLATION_PATH_BACKUP" "$INSTALLATION_PATH"
+        log "Restored existing installation"
+    fi
+    exit 1
+}
+
 # Generic emergency error handler that exits the script immediately
 # Print additional custom message if passed as first argument
 # Examples:
@@ -85,8 +98,7 @@ Check install log for details:"
     print_lc "$1"
     print_lc "****************************************"
   fi
-  log "Abort!"
-  exit 1
+  exit_on_abort
 }
 
 # Check if current distro is a 32-bit version
@@ -112,14 +124,14 @@ _check_existing_installation() {
 
 If you want to keep your settings
 - the installation folder will be moved as backup to
-  '${INSTALLATION_PATH_PREV}'
+  '${INSTALLATION_PATH_BACKUP}'
 - the current install configuration will be used
 - your './shared/' folder will be copied from the backup
 - any other file changes have to be copied manually
 
 else
 - the installation folder will be moved as backup to
-  '${INSTALLATION_PATH_PREV}'
+  '${INSTALLATION_PATH_BACKUP}'
 - you will be prompted to choose installation options
 - NOTE: previously installed features will currently
         not be removed!
@@ -136,14 +148,14 @@ Keep your current settings? [Y/n]"
                 ;;
         esac
         log "USE_PREV_INSTALL_CONFIG=${USE_PREV_INSTALL_CONFIG}"
-        mv -f "$INSTALLATION_PATH" "$INSTALLATION_PATH_PREV"
-        log "Moved existing installation to '${INSTALLATION_PATH_PREV}'"
+        mv -f "$INSTALLATION_PATH" "$INSTALLATION_PATH_BACKUP"
+        log "Moved existing installation to '${INSTALLATION_PATH_BACKUP}'"
     fi
 }
 
 _load_installation_config() {
     if [[ "${USE_PREV_INSTALL_CONFIG}" == true ]]; then
-        local old_install_conf="${INSTALLATION_PATH_PREV}/${INSTALL_CONFIG_FILENAME}"
+        local old_install_conf="${INSTALLATION_PATH_BACKUP}/${INSTALL_CONFIG_FILENAME}"
         if [[ -f "${old_install_conf}" ]]; then
             cp -f "${old_install_conf}" "${INSTALL_CONFIG_CURRENT}"
             source "${INSTALL_CONFIG_CURRENT}" || exit_on_error
