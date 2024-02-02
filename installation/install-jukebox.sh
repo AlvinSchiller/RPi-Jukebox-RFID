@@ -124,12 +124,7 @@ Keep your current settings? [y/N]"
         read -r response
         case "$response" in
             [yY][eE][sS]|[yY])
-                if [[ -f "${INSTALL_CONFIG_CURRENT}" ]]; then
-                    USE_PREV_INSTALL_CONFIG=true
-                else
-                    print_lc "ERROR: No '${INSTALL_CONFIG_FILENAME} found. Can't use configuration."
-                    print_lc "       Choosing installation options required!"
-                fi
+                USE_PREV_INSTALL_CONFIG=true
                 ;;
             *)
                 ;;
@@ -142,8 +137,15 @@ Keep your current settings? [y/N]"
 
 _load_installation_config() {
     if [[ "${USE_PREV_INSTALL_CONFIG}" == true ]]; then
-        cp -f "${INSTALLATION_PATH_PREV}/${INSTALL_CONFIG_FILENAME}" "${INSTALL_CONFIG_CURRENT}"
-        source "${INSTALL_CONFIG_CURRENT}" || exit_on_error
+        if [[ -f "${INSTALL_CONFIG_CURRENT}" ]]; then
+            cp -f "${INSTALLATION_PATH_PREV}/${INSTALL_CONFIG_FILENAME}" "${INSTALL_CONFIG_CURRENT}"
+            source "${INSTALL_CONFIG_CURRENT}" || exit_on_error
+        else
+            USE_PREV_INSTALL_CONFIG=false
+            print_lc "ERROR: No '${INSTALL_CONFIG_FILENAME}' found. Can't use configuration."
+            print_lc "       Choosing installation options required!"
+            log "USE_PREV_INSTALL_CONFIG=${USE_PREV_INSTALL_CONFIG}"
+        fi
     fi
 }
 
