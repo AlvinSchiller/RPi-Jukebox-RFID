@@ -1,7 +1,7 @@
 _write_prev_shared() {
     if [[ "${USE_PREV_INSTALL_CONFIG}" == true ]]; then
         rm -rf "${SHARED_PATH}"
-        cp -f "${INSTALLATION_PATH_PREV}/${SHARED_FOLDERNAME}" "${SHARED_PATH}"
+        cp -rf "${INSTALLATION_PATH_PREV}/${SHARED_FOLDERNAME}" "${SHARED_PATH}"
     fi
 }
 
