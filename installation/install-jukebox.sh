@@ -143,12 +143,13 @@ Keep your current settings? [Y/n]"
 
 _load_installation_config() {
     if [[ "${USE_PREV_INSTALL_CONFIG}" == true ]]; then
-        if [[ -f "${INSTALL_CONFIG_CURRENT}" ]]; then
-            cp -f "${INSTALLATION_PATH_PREV}/${INSTALL_CONFIG_FILENAME}" "${INSTALL_CONFIG_CURRENT}"
+        local old_install_conf="${INSTALLATION_PATH_PREV}/${INSTALL_CONFIG_FILENAME}"
+        if [[ -f "${old_install_conf}" ]]; then
+            cp -f "${old_install_conf}" "${INSTALL_CONFIG_CURRENT}"
             source "${INSTALL_CONFIG_CURRENT}" || exit_on_error
         else
             USE_PREV_INSTALL_CONFIG=false
-            print_lc "ERROR: No '${INSTALL_CONFIG_FILENAME}' found. Can't use configuration."
+            print_lc "ERROR: No '${old_install_conf}' found. Can't use configuration."
             print_lc "       Choosing installation options required!"
             log "USE_PREV_INSTALL_CONFIG=${USE_PREV_INSTALL_CONFIG}"
         fi
