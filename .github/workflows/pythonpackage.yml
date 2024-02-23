@@ -29,9 +29,9 @@ jobs:
         pip install wheel
         pip install spidev
         pip install -r requirements.txt
+        pip install -r requirements-dev.txt
     - name: Lint with flake8
       run: |
-        pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --filename=*.py,*.py.*
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
@@ -39,7 +39,6 @@ jobs:
     - name: Test with pytest
       working-directory: ./components/gpio_control
       run: |
-        pip install -r requirements.txt
         pytest --cov --cov-report xml
     - name: Report to Coveralls (parallel)
       uses: coverallsapp/github-action@v2

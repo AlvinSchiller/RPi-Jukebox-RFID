@@ -15,9 +15,6 @@ systemctl disable phoniebox-rotary-encoder.service
 systemctl stop phoniebox-gpio-buttons.service
 systemctl disable phoniebox-gpio-buttons.service
 
-echo 'Install all required python modules'
-python3 -m pip install --upgrade --force-reinstall -r requirements.txt
-
 echo
 echo 'Installing GPIO_Control service'
 read -p "Press enter to continue " -n 1 -r

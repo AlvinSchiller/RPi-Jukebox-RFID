@@ -1154,7 +1154,6 @@ install_main() {
 
     # GPIO-Control
     if [[ "${GPIOconfig}" == "YES" ]]; then
-        ${pip_install} -r "${jukebox_dir}"/requirements-GPIO.txt
         sudo systemctl enable phoniebox-gpio-control.service
         if [[ ! -f "${jukebox_dir}"/settings/gpio_settings.ini ]]; then
             cp "${jukebox_dir}"/misc/sampleconfigs/gpio_settings.ini.sample "${jukebox_dir}"/settings/gpio_settings.ini
