@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Constants
-JUKEBOX_ZMQ_TMP_DIR="${HOME_PATH}/libzmq"
-JUKEBOX_ZMQ_PREFIX="/usr/local"
+JUKEBOX_ZMQ_TMP_DIR="${INSTALLATION_PATH}/.tmp/libzmq"
+JUKEBOX_ZMQ_PREFIX="${INSTALLATION_PATH}/.lib"
 JUKEBOX_ZMQ_VERSION="4.3.5"
 
 JUKEBOX_PULSE_CONFIG="${HOME_PATH}"/.config/pulse/default.pa
@@ -79,6 +79,7 @@ _jukebox_core_build_and_install_pyzmq() {
 
   if ! pip list | grep -F pyzmq >> /dev/null; then
     mkdir -p "${JUKEBOX_ZMQ_TMP_DIR}" || exit_on_error
+    mkdir -p "${JUKEBOX_ZMQ_PREFIX}" || exit_on_error
     if [ "$BUILD_LIBZMQ_WITH_DRAFTS_ON_DEVICE" = true ] ; then
       _jukebox_core_build_libzmq_with_drafts
     else
