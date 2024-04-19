@@ -30,7 +30,10 @@ _jukebox_core_install_python_requirements() {
   source "$VIRTUAL_ENV/bin/activate"
 
   pip install --upgrade pip
-  pip install --no-cache-dir -r "${INSTALLATION_PATH}/requirements.txt"
+
+  _jukebox_core_build_and_install_pyzmq
+  ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
+    pip install --no-cache-dir -r "${INSTALLATION_PATH}/requirements.txt"
 }
 
 _jukebox_core_configure_pulseaudio() {
@@ -84,9 +87,6 @@ _jukebox_core_build_and_install_pyzmq() {
     else
       _jukebox_core_download_prebuilt_libzmq_with_drafts
     fi
-
-    ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
-      pip install -v 'pyzmq<26' --no-binary pyzmq
   else
     print_lc "    Skipping. pyzmq already installed"
   fi
@@ -118,7 +118,7 @@ _jukebox_core_check() {
     verify_dirs_exists "${VIRTUAL_ENV}"
 
     local pip_modules=$(get_args_from_file "${INSTALLATION_PATH}/requirements.txt")
-    verify_pip_modules pyzmq $pip_modules
+    verify_pip_modules $pip_modules
 
     log "  Verify ZMQ version '${JUKEBOX_ZMQ_VERSION}'"
     local zmq_version=$(python -c 'import zmq; print(f"{zmq.zmq_version()}")')
@@ -149,7 +149,6 @@ _jukebox_core_check() {
 _run_setup_jukebox_core() {
     _jukebox_core_install_os_dependencies
     _jukebox_core_install_python_requirements
-    _jukebox_core_build_and_install_pyzmq
     _jukebox_core_configure_pulseaudio
     _jukebox_core_install_settings
     _jukebox_core_register_as_service
