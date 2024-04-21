@@ -33,7 +33,7 @@ _jukebox_core_install_python_requirements() {
 
   _jukebox_core_build_and_install_pyzmq
   ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
-    pip install --no-cache-dir -r "${INSTALLATION_PATH}/requirements.txt"
+    pip install --no-cache-dir -r "${INSTALLATION_PATH}/requirements.txt" --constraint "${INSTALLATION_PATH}/constraint.txt"
 }
 
 _jukebox_core_configure_pulseaudio() {
