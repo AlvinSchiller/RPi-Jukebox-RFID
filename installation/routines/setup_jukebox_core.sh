@@ -30,7 +30,8 @@ _jukebox_core_install_python_requirements() {
   source "$VIRTUAL_ENV/bin/activate"
 
   pip install --upgrade pip
-  pip install --no-cache-dir -r "${INSTALLATION_PATH}/requirements.txt" --constraint "${INSTALLATION_PATH}/constraint.txt"
+  PIP_CONSTRAINT="${INSTALLATION_PATH}/constraint.txt" \
+   pip install --no-cache-dir -r "${INSTALLATION_PATH}/requirements.txt"
 }
 
 _jukebox_core_configure_pulseaudio() {
@@ -85,8 +86,8 @@ _jukebox_core_build_and_install_pyzmq() {
       _jukebox_core_download_prebuilt_libzmq_with_drafts
     fi
 
-    ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
-      pip install -v pyzmq --no-binary pyzmq --constraint "${INSTALLATION_PATH}/constraint.txt"
+    PIP_CONSTRAINT="${INSTALLATION_PATH}/constraint.txt" ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
+      pip install -v pyzmq --no-binary pyzmq
 
   else
     print_lc "    Skipping. pyzmq already installed"
