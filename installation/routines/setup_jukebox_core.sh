@@ -86,7 +86,7 @@ _jukebox_core_build_and_install_pyzmq() {
     fi
 
     ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
-      pip install -v 'pyzmq==26.0.0' --no-binary pyzmq --constraint "${INSTALLATION_PATH}/constraint.txt"
+      pip install -v pyzmq --no-binary pyzmq --constraint "${INSTALLATION_PATH}/constraint.txt"
 
   else
     print_lc "    Skipping. pyzmq already installed"
