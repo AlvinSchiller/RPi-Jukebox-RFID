@@ -91,7 +91,7 @@ _jukebox_core_build_and_install_pyzmq() {
       pip install -v pyzmq --no-binary pyzmq
 
       print_lc "      ldd output Start"
-      ldd "$VIRTUAL_EN/lib/python3.11/site-packages/zmq/backend/cython/_zmq.cpython-311-arm-linux-gnueabihf.so"
+      ldd "$VIRTUAL_ENV/lib/python3.11/site-packages/zmq/backend/cython/_zmq.cpython-311-arm-linux-gnueabihf.so"
       print_lc "      ldd output End"
   else
     print_lc "    Skipping. pyzmq already installed"
