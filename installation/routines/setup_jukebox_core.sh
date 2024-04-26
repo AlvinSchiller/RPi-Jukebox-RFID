@@ -12,6 +12,10 @@ JUKEBOX_SERVICE_NAME="${SYSTEMD_USR_PATH}/jukebox-daemon.service"
 _jukebox_core_install_os_dependencies() {
   print_lc "  Install Jukebox OS dependencies"
 
+
+  print_lc "      Remove apt libzmq"
+  sudo apt-get -y remove libzmq5
+
   local apt_packages=$(get_args_from_file "${INSTALLATION_PATH}/packages-core.txt")
   sudo apt-get -y update && sudo apt-get -y install \
     $apt_packages \
@@ -79,12 +83,16 @@ _jukebox_core_build_and_install_pyzmq() {
   print_lc "  Install pyzmq with libzmq-drafts to support WebSockets"
 
   if ! pip list | grep -F pyzmq >> /dev/null; then
+
     mkdir -p "${JUKEBOX_ZMQ_TMP_DIR}" || exit_on_error
     if [ "$BUILD_LIBZMQ_WITH_DRAFTS_ON_DEVICE" = true ] ; then
       _jukebox_core_build_libzmq_with_drafts
     else
       _jukebox_core_download_prebuilt_libzmq_with_drafts
     fi
+
+    print_lc "      Run ldconfig"
+    sudo ldconfig -v
 
     PIP_CONSTRAINT="${INSTALLATION_PATH}/constraint.txt" ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
       pip install -v pyzmq --no-binary pyzmq
