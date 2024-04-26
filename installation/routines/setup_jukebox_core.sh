@@ -89,6 +89,10 @@ _jukebox_core_build_and_install_pyzmq() {
 
     ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
       pip install -v pyzmq --no-binary pyzmq
+
+      print_lc "      ldd output Start"
+      ldd "$VIRTUAL_ENV/bin/pyzmq"
+      print_lc "      ldd output End"
   else
     print_lc "    Skipping. pyzmq already installed"
   fi
