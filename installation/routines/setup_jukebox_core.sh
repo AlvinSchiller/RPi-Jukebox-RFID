@@ -87,7 +87,6 @@ _jukebox_core_build_and_install_pyzmq() {
     sudo cat "/usr/local/lib/pkgconfig/libzmq.pc"
     print_lc "      End apt installed zmq output"
 
-
     mkdir -p "${JUKEBOX_ZMQ_TMP_DIR}" || exit_on_error
     if [ "$BUILD_LIBZMQ_WITH_DRAFTS_ON_DEVICE" = true ] ; then
       _jukebox_core_build_libzmq_with_drafts
@@ -96,6 +95,9 @@ _jukebox_core_build_and_install_pyzmq() {
     fi
 
     sudo ldconfig -v
+
+    export LDFLAGS="-Wl,-rpath,/usr/local"
+    export SKBUILD_CMAKE_VERBOSE=true
 
     ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
       pip install -v pyzmq --no-binary pyzmq
