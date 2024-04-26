@@ -78,6 +78,11 @@ _jukebox_core_build_and_install_pyzmq() {
   print_lc "  Install pyzmq with libzmq-drafts to support WebSockets"
 
   if ! pip list | grep -F pyzmq >> /dev/null; then
+
+    print_lc "      Start apt installed zmq output"
+    apt list --installed | grep "zmq"
+    print_lc "      End apt installed zmq output"
+
     mkdir -p "${JUKEBOX_ZMQ_TMP_DIR}" || exit_on_error
     if [ "$BUILD_LIBZMQ_WITH_DRAFTS_ON_DEVICE" = true ] ; then
       _jukebox_core_build_libzmq_with_drafts
@@ -90,9 +95,9 @@ _jukebox_core_build_and_install_pyzmq() {
     ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
       pip install -v pyzmq --no-binary pyzmq
 
-      print_lc "      ldd output Start"
+      print_lc "      Start ldd output"
       ldd "$VIRTUAL_ENV/lib/python3.11/site-packages/zmq/backend/cython/_zmq.cpython-311-arm-linux-gnueabihf.so"
-      print_lc "      ldd output End"
+      print_lc "      End ldd output"
   else
     print_lc "    Skipping. pyzmq already installed"
   fi
