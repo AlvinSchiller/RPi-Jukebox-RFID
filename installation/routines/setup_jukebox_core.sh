@@ -85,6 +85,8 @@ _jukebox_core_build_and_install_pyzmq() {
       _jukebox_core_download_prebuilt_libzmq_with_drafts
     fi
 
+    sudo ldconfig
+
     ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
       pip install -v pyzmq --no-binary pyzmq
   else
