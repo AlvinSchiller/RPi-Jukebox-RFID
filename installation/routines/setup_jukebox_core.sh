@@ -81,7 +81,12 @@ _jukebox_core_build_and_install_pyzmq() {
 
     print_lc "      Start apt installed zmq output"
     apt list --installed | grep "zmq"
+    print_lc "---"
+    sudo ls -l "/usr/local/lib"
+    print_lc "---"
+    sudo cat "/usr/local/lib/pkgconfig/libzmq.pc"
     print_lc "      End apt installed zmq output"
+
 
     mkdir -p "${JUKEBOX_ZMQ_TMP_DIR}" || exit_on_error
     if [ "$BUILD_LIBZMQ_WITH_DRAFTS_ON_DEVICE" = true ] ; then
