@@ -96,10 +96,7 @@ _jukebox_core_build_and_install_pyzmq() {
 
     sudo ldconfig -v
 
-    export LDFLAGS="-Wl,-rpath,/usr/local"
-    export SKBUILD_CMAKE_VERBOSE=true
-
-    ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
+    ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 LDFLAGS="-Wl,-rpath,/usr/local" SKBUILD_CMAKE_VERBOSE=true \
       pip install -v pyzmq --no-binary pyzmq
 
       print_lc "      Start ldd output"
