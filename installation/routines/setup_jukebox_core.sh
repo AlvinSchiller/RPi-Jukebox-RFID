@@ -52,6 +52,7 @@ _jukebox_core_build_libzmq_with_drafts() {
   cd ${zmq_filename} || exit_on_error
   ./configure --prefix=${JUKEBOX_ZMQ_PREFIX} --enable-drafts --disable-Werror
   make -j${cpu_count} && sudo make install
+  sudo ldconfig
 }
 
 _jukebox_core_download_prebuilt_libzmq_with_drafts() {
@@ -64,6 +65,7 @@ _jukebox_core_download_prebuilt_libzmq_with_drafts() {
   tar -xzf ${zmq_tar_filename}
   rm -f ${zmq_tar_filename}
   sudo rsync -a ./* ${JUKEBOX_ZMQ_PREFIX}/
+  sudo ldconfig
 }
 
 _jukebox_core_build_and_install_pyzmq() {
@@ -85,8 +87,8 @@ _jukebox_core_build_and_install_pyzmq() {
       _jukebox_core_download_prebuilt_libzmq_with_drafts
     fi
 
-    ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 \
-      pip install -v 'pyzmq<26' --no-binary pyzmq
+    ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 LDFLAGS="-Wl,-rpath,${JUKEBOX_ZMQ_PREFIX}/lib" \
+      pip install -v --no-cache-dir 'pyzmq<26' --no-binary pyzmq
   else
     print_lc "    Skipping. pyzmq already installed"
   fi
