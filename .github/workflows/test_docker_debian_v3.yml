@@ -15,6 +15,7 @@ on:
         - 'src/jukebox/jukebox/version.py'
         - 'packages*.txt'
         - 'requirements*.txt'
+        - 'constraint*.txt'
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
@@ -28,6 +29,7 @@ on:
         - 'src/jukebox/jukebox/version.py'
         - 'packages*.txt'
         - 'requirements*.txt'
+        - 'constraint*.txt'
 
 # let only one instance run the test so cache is not corrupted.
 # cancel already running instances as only the last run will be relevant
