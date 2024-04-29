@@ -32,8 +32,9 @@ _jukebox_core_install_python_requirements() {
   source "$VIRTUAL_ENV/bin/activate"
 
   pip install --upgrade pip
-  ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 LDFLAGS="-Wl,-rpath,${JUKEBOX_ZMQ_PREFIX}/lib" \
-    pip install --no-cache-dir -r "${INSTALLATION_PATH}/requirements.txt" -c "${INSTALLATION_PATH}/constraint.txt"
+  PIP_CONSTRAINT="${INSTALLATION_PATH}/constraint.txt" \
+    ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 LDFLAGS="-Wl,-rpath,${JUKEBOX_ZMQ_PREFIX}/lib" \
+      pip install --no-cache-dir -r "${INSTALLATION_PATH}/requirements.txt"
 }
 
 _jukebox_core_configure_pulseaudio() {
