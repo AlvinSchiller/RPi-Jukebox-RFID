@@ -19,6 +19,8 @@ _jukebox_core_install_os_dependencies() {
     --allow-downgrades \
     --allow-remove-essential \
     --allow-change-held-packages
+
+  _jukebox_core_build_and_install_libzmq
 }
 
 _jukebox_core_install_python_requirements() {
@@ -30,7 +32,8 @@ _jukebox_core_install_python_requirements() {
   source "$VIRTUAL_ENV/bin/activate"
 
   pip install --upgrade pip
-  pip install --no-cache-dir -r "${INSTALLATION_PATH}/requirements.txt"
+  ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 LDFLAGS="-Wl,-rpath,${JUKEBOX_ZMQ_PREFIX}/lib" \
+    pip install --no-cache-dir -r "${INSTALLATION_PATH}/requirements.txt"
 }
 
 _jukebox_core_configure_pulseaudio() {
@@ -45,7 +48,6 @@ _jukebox_core_build_libzmq_with_drafts() {
   local zmq_tar_filename="${zmq_filename}.tar.gz"
   local cpu_count=${CPU_COUNT:-$(python3 -c "import os; print(os.cpu_count())")}
 
-  cd "${JUKEBOX_ZMQ_TMP_DIR}" || exit_on_error
   wget --quiet https://github.com/zeromq/libzmq/releases/download/v${JUKEBOX_ZMQ_VERSION}/${zmq_tar_filename} || exit_on_error "Download failed"
   tar -xzf ${zmq_tar_filename}
   rm -f ${zmq_tar_filename}
@@ -60,7 +62,6 @@ _jukebox_core_download_prebuilt_libzmq_with_drafts() {
   local zmq_tar_filename="libzmq.tar.gz"
   ARCH=$(get_architecture)
 
-  cd "${JUKEBOX_ZMQ_TMP_DIR}" || exit_on_error
   wget --quiet https://github.com/pabera/libzmq/releases/download/v${JUKEBOX_ZMQ_VERSION}/libzmq5-${ARCH}-${JUKEBOX_ZMQ_VERSION}.tar.gz -O ${zmq_tar_filename} || exit_on_error "Download failed"
   tar -xzf ${zmq_tar_filename}
   rm -f ${zmq_tar_filename}
@@ -68,7 +69,7 @@ _jukebox_core_download_prebuilt_libzmq_with_drafts() {
   sudo ldconfig
 }
 
-_jukebox_core_build_and_install_pyzmq() {
+_jukebox_core_build_and_install_libzmq() {
   # ZMQ
   # Because the latest stable release of ZMQ does not support WebSockets
   # we need to compile the latest version in Github
@@ -77,21 +78,17 @@ _jukebox_core_build_and_install_pyzmq() {
   # https://pyzmq.readthedocs.io/en/latest/howto/draft.html
   # https://github.com/MonsieurV/ZeroMQ-RPi/blob/master/README.md
   # https://github.com/zeromq/pyzmq/issues/1523#issuecomment-1593120264
-  print_lc "  Install pyzmq with libzmq-drafts to support WebSockets"
+  print_lc "  Install libzmq-drafts to support WebSockets"
 
-  if ! pip list | grep -F pyzmq >> /dev/null; then
-    mkdir -p "${JUKEBOX_ZMQ_TMP_DIR}" || exit_on_error
-    if [ "$BUILD_LIBZMQ_WITH_DRAFTS_ON_DEVICE" = true ] ; then
-      _jukebox_core_build_libzmq_with_drafts
-    else
-      _jukebox_core_download_prebuilt_libzmq_with_drafts
-    fi
-
-    ZMQ_PREFIX="${JUKEBOX_ZMQ_PREFIX}" ZMQ_DRAFT_API=1 LDFLAGS="-Wl,-rpath,${JUKEBOX_ZMQ_PREFIX}/lib" \
-      pip install -v --no-cache-dir 'pyzmq<26' --no-binary pyzmq
+  mkdir -p "${JUKEBOX_ZMQ_TMP_DIR}" || exit_on_error
+  cd "${JUKEBOX_ZMQ_TMP_DIR}" || exit_on_error
+  if [ "$BUILD_LIBZMQ_WITH_DRAFTS_ON_DEVICE" = true ] ; then
+    _jukebox_core_build_libzmq_with_drafts
   else
-    print_lc "    Skipping. pyzmq already installed"
+    _jukebox_core_download_prebuilt_libzmq_with_drafts
   fi
+  cd ${HOME_PATH}
+  rm -rf "${JUKEBOX_ZMQ_TMP_DIR}"
 }
 
 _jukebox_core_install_settings() {
@@ -120,7 +117,7 @@ _jukebox_core_check() {
     verify_dirs_exists "${VIRTUAL_ENV}"
 
     local pip_modules=$(get_args_from_file "${INSTALLATION_PATH}/requirements.txt")
-    verify_pip_modules pyzmq $pip_modules
+    verify_pip_modules $pip_modules
 
     log "  Verify ZMQ version '${JUKEBOX_ZMQ_VERSION}'"
     local zmq_version=$(python -c 'import zmq; print(f"{zmq.zmq_version()}")')
@@ -151,7 +148,6 @@ _jukebox_core_check() {
 _run_setup_jukebox_core() {
     _jukebox_core_install_os_dependencies
     _jukebox_core_install_python_requirements
-    _jukebox_core_build_and_install_pyzmq
     _jukebox_core_configure_pulseaudio
     _jukebox_core_install_settings
     _jukebox_core_register_as_service
