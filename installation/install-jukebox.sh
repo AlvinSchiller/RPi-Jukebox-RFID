@@ -8,7 +8,7 @@
 # you may specify them like this
 # cd; GIT_USER='MiczFlor' GIT_BRANCH='future3/develop' bash <(wget -qO- https://raw.githubusercontent.com/MiczFlor/RPi-Jukebox-RFID/future3/develop/installation/install-jukebox.sh)
 #
-set -euxo pipefail
+set -exo pipefail
 export LC_ALL=C
 
 # Set Repo variables if not specified when calling the script
