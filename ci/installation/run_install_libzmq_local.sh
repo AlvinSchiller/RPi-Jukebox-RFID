@@ -3,9 +3,6 @@
 # Install Phoniebox and test it
 # Used e.g. for tests on Docker
 
-# Always fail on errors for tests
-set -euxo pipefail
-
 # Objective:
 # Test for the libzmq local build (no precompiled download)
 

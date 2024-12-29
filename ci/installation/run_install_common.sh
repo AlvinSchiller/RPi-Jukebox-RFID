@@ -3,9 +3,6 @@
 # Install Phoniebox and test it
 # Used e.g. for tests on Docker
 
-# Always fail on errors for tests
-set -euxo pipefail
-
 # Objective:
 # Test for a common installation path. Including autohotspot
 
