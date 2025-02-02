@@ -9,15 +9,17 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
-name: "CodeQL v3"
+name: "CodeQL"
 
 on:
   push:
     branches:
+      - develop
       - 'future3/develop'
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
+      - develop
       - 'future3/develop'
   schedule:
     - cron: '16 18 * * 0'
@@ -92,4 +94,3 @@ jobs:
       uses: github/codeql-action/analyze@v3
       with:
         category: "/${{ github.head_ref || github.ref_name }}:language:${{matrix.language}}"
-
