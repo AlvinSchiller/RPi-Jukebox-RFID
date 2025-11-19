@@ -833,8 +833,8 @@ install_main() {
     local jukebox_dir="$1"
     local apt_get="sudo apt-get -qq --yes"
     local allow_downgrades="--allow-downgrades --allow-remove-essential --allow-change-held-packages"
-    local pip_install="sudo python3 -m pip install --upgrade --force-reinstall -q"
-    local pip_uninstall="sudo python3 -m pip uninstall -y -q"
+    local pip_install="sudo python3 -m pip install --upgrade --force-reinstall"
+    local pip_uninstall="sudo python3 -m pip uninstall -y"
 
     clear
 
@@ -913,9 +913,11 @@ install_main() {
     source "${jukebox_dir}"/scripts/helperscripts/inc.helper.sh
     source "${jukebox_dir}"/scripts/helperscripts/inc.networkHelper.sh
 
+    echo ""
+    echo "--------------------------------"
+    echo "Installing system dependecies..."
     # Remove excluded libs, if installed - see https://github.com/MiczFlor/RPi-Jukebox-RFID/pull/2469
     call_with_args_from_file "${jukebox_dir}"/packages-excluded.txt ${apt_get} ${allow_downgrades} remove
-
     call_with_args_from_file "${jukebox_dir}"/packages.txt ${apt_get} ${allow_downgrades} install
 
     # in the docker test env fiddling with resolv.conf causes issues, see https://stackoverflow.com/a/60576223
@@ -944,6 +946,9 @@ install_main() {
     chmod 777 ${jukebox_dir}/settings/version
 
     # Remove excluded libs, if installed - see https://github.com/MiczFlor/RPi-Jukebox-RFID/pull/2469
+    echo ""
+    echo "--------------------------------"
+    echo "Remove excluded dependecies..."
     ${pip_uninstall} -r "${jukebox_dir}"/requirements-excluded.txt
 
     # Install required spotify packages
@@ -978,11 +983,15 @@ install_main() {
     fi
 
     # always build lgpio as the pypi binaries are incomplete (armv6, python3.13) or broken (bullseye)
+    echo ""
+    echo "--------------------------------"
     echo "Installing lgpio build dependecies..."
     mkdir -p tmp && cd tmp && wget -q http://abyz.me.uk/lg/lg.zip && unzip lg.zip > /dev/null && cd lg && make && sudo make install
     cd "${HOME_DIR}" && sudo rm -rf tmp > /dev/null
 
     # Install more required packages
+    echo ""
+    echo "--------------------------------"
     echo "Installing additional Python packages..."
     ${pip_install} -r "${jukebox_dir}"/requirements.txt
 
