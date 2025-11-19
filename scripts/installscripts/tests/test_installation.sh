@@ -337,7 +337,6 @@ call_with_args_from_file() {
 verify_apt_packages() {
     local jukebox_dir="$1"
     local packages=$(call_with_args_from_file "${jukebox_dir}"/packages.txt echo)
-    local packages_raspberrypi=$(call_with_args_from_file "${jukebox_dir}"/packages-raspberrypi.txt echo)
     local packages_spotify=$(call_with_args_from_file "${jukebox_dir}"/packages-spotify.txt echo)
     local packages_autohotspot_dhcpcd=$(call_with_args_from_file "${jukebox_dir}"/packages-autohotspot_dhcpcd.txt echo)
     local packages_autohotspot_NetworkManager=$(call_with_args_from_file "${jukebox_dir}"/packages-autohotspot_NetworkManager.txt echo)
@@ -360,11 +359,6 @@ verify_apt_packages() {
         if [[ $(is_NetworkManager_enabled) == true ]]; then
             packages="${packages} ${packages_autohotspot_NetworkManager}"
         fi
-    fi
-
-    # check for raspberry pi packages only on raspberry pi's but not on test docker containers running on x86_64 machines
-    if [[ $(uname -m) =~ ^armv.+$ ]]; then
-        packages="${packages} ${packages_raspberrypi}"
     fi
 
     local apt_list_installed=$(apt -qq list --installed 2>/dev/null)

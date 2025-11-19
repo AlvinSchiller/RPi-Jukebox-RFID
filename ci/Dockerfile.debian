@@ -86,14 +86,13 @@ ARG GIT_URL
 ENV CI_RUNNING=true
 ENV GIT_BRANCH=$GIT_BRANCH GIT_URL=$GIT_URL
 
-COPY --chown=root:$TEST_USER_GROUP --chmod=770 packages.txt packages-raspberrypi.txt ./
+COPY --chown=root:$TEST_USER_GROUP --chmod=770 packages.txt ./
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && echo "--- install internal packages ---" \
   && apt-get update \
   # remove resolvconf as installation will fail in container
   && sed 's/#.*//g' packages.txt | sed 's/resolvconf//' | xargs apt-get -y install \
-  && sed 's/#.*//g' packages-raspberrypi.txt | xargs apt-get -y install \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=root:$TEST_USER_GROUP --chmod=770 scripts/installscripts/install-jukebox.sh ./

@@ -916,11 +916,6 @@ install_main() {
     # Remove excluded libs, if installed - see https://github.com/MiczFlor/RPi-Jukebox-RFID/pull/2469
     call_with_args_from_file "${jukebox_dir}"/packages-excluded.txt ${apt_get} ${allow_downgrades} remove
 
-    # some packages are only available on raspberry pi's but not on test docker containers running on x86_64 machines
-    if [[ $(uname -m) =~ ^armv.+$ ]]; then
-        call_with_args_from_file "${jukebox_dir}"/packages-raspberrypi.txt ${apt_get} ${allow_downgrades} install
-    fi
-
     call_with_args_from_file "${jukebox_dir}"/packages.txt ${apt_get} ${allow_downgrades} install
 
     # in the docker test env fiddling with resolv.conf causes issues, see https://stackoverflow.com/a/60576223
