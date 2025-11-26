@@ -20,7 +20,7 @@ on:
         git_base_branch:
           required: false
           type: string
-          default: develop
+          default: feature/optimize-ci-docker-build
         local_registry_port:
           required: false
           type: number
