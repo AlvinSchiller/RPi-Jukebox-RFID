@@ -13,10 +13,14 @@ on:
           required: false
           type: string
           default: rpi-jukebox-rfid
-        cache_scope:
+        git_branch:
           required: false
           type: string
-          default: ${{ github.ref }}-test-debian
+          default: ${{ github.head_ref || github.ref_name }}
+        git_base_branch:
+          required: false
+          type: string
+          default: develop
         local_registry_port:
           required: false
           type: number
@@ -29,7 +33,7 @@ on:
 # let only one instance run the test so cache is not corrupted.
 # cancel already running instances as only the last run will be relevant
 concurrency:
-    group: ${{ inputs.cache_scope }}-${{ inputs.debian_codename }}-${{ inputs.platform }}
+    group: ${{ inputs.git_branch }}-${{ inputs.debian_codename }}-${{ inputs.platform }}
     cancel-in-progress: true
 
 jobs:
@@ -39,7 +43,6 @@ jobs:
     runs-on: ${{ inputs.runs_on }}
 
     outputs:
-        cache_key: ${{ steps.vars.outputs.cache_key }}
         image_file_name: ${{ steps.vars.outputs.image_file_name }}
         image_tag_name: ${{ steps.vars.outputs.image_tag_name }}
         docker_run_options: ${{ steps.vars.outputs.docker_run_options }}
@@ -68,26 +71,28 @@ jobs:
       env:
         DEBIAN_CODENAME: ${{ inputs.debian_codename }}
         DOCKER_IMAGE_NAME: ${{ inputs.docker_image_name }}
-        CACHE_SCOPE: ${{ inputs.cache_scope }}
         PLATFORM: ${{ inputs.platform }}
       run: |
         PLATFORM=${PLATFORM////_}
-        echo "image_tag_name=${{ env.DOCKER_IMAGE_NAME }}:${{ env.DEBIAN_CODENAME }}-${PLATFORM}-test" >> $GITHUB_OUTPUT
-        echo "image_file_name=${{ env.DOCKER_IMAGE_NAME }}-${{ env.DEBIAN_CODENAME }}-${PLATFORM}.tar" >> $GITHUB_OUTPUT
-        echo "cache_scope=${{ env.CACHE_SCOPE }}-${{ env.DEBIAN_CODENAME }}-${PLATFORM}" >> $GITHUB_OUTPUT
+        echo "image_scope=${{ env.DEBIAN_CODENAME }}-${PLATFORM}" >> $GITHUB_OUTPUT
+        echo "image_tag_name=${{ env.DOCKER_IMAGE_NAME }}:${image_scope}" >> $GITHUB_OUTPUT
+        echo "image_file_name=${{ env.DOCKER_IMAGE_NAME }}-${image_scope}.tar" >> $GITHUB_OUTPUT
+
 
     - name: Set Output vars
       id: vars
       env:
         LOCAL_REGISTRY_PORT: ${{ inputs.local_registry_port }}
+        GIT_BRANCH: ${{ inputs.git_branch }}
+        GIT_BASE_BRANCH: ${{ inputs.git_base_branch }}
         PLATFORM: ${{ inputs.platform }}
       run: |
         echo "image_tag_name=${{ steps.pre-vars.outputs.image_tag_name }}" >> $GITHUB_OUTPUT
         echo "image_tag_name_local_base=localhost:${{ env.LOCAL_REGISTRY_PORT }}/${{ steps.pre-vars.outputs.image_tag_name }}-base" >> $GITHUB_OUTPUT
         echo "image_file_name=${{ steps.pre-vars.outputs.image_file_name }}" >> $GITHUB_OUTPUT
         echo "image_file_path=./${{ steps.pre-vars.outputs.image_file_name }}" >> $GITHUB_OUTPUT
-        echo "cache_scope=${{ steps.pre-vars.outputs.cache_scope }}" >> $GITHUB_OUTPUT
-        echo "cache_key=${{ steps.pre-vars.outputs.cache_scope }}-${{ github.sha }}#${{ github.run_attempt }}" >> $GITHUB_OUTPUT
+        echo "cache_base_scope=${{ env.GIT_BASE_BRANCH }}-${{ steps.pre-vars.outputs.image_scope }}" >> $GITHUB_OUTPUT
+        echo "cache_scope=${{ env.GIT_BRANCH }}-${{ steps.pre-vars.outputs.image_scope }}" >> $GITHUB_OUTPUT
         if [ "${{ env.PLATFORM }}" == "linux/arm/v6" ] ; then
             echo "docker_run_options=-e QEMU_CPU=arm1176" >> $GITHUB_OUTPUT
         fi
@@ -103,11 +108,13 @@ jobs:
         target: test-code
         platforms: ${{ inputs.platform }}
         tags: ${{ steps.vars.outputs.image_tag_name_local_base }}
-        cache-from: type=gha,scope=${{ steps.vars.outputs.cache_scope }}
+        cache-from: |
+            type=gha,scope=${{ steps.vars.outputs.cache_base_scope }}     # globaler Hauptcache
+            type=gha,scope=${{ steps.vars.outputs.cache_scope }}          # branch-spezifischer Cache
         cache-to: type=gha,mode=max,scope=${{ steps.vars.outputs.cache_scope }}
         build-args: |
           DEBIAN_CODENAME=${{ inputs.debian_codename }}
-          GIT_BRANCH=${{ github.head_ref || github.ref_name }}
+          GIT_BRANCH=${{ inputs.GIT_BRANCH }}
           GIT_URL=${{ github.server_url }}/${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
     # Build new image with updates packages based on base image. Layers will NOT be chached. Result is written to file.
@@ -121,7 +128,7 @@ jobs:
         target: test-update
         platforms: ${{ inputs.platform }}
         tags: ${{ steps.vars.outputs.image_tag_name }}
-        cache-from: type=gha,scope=${{ steps.vars.outputs.cache_scope }}
+        # cache-from: type=gha,scope=${{ steps.vars.outputs.cache_scope }}
         # DON'T use 'cache-to' here as the layer is then cached and this build would be useless
         outputs: type=docker,dest=${{ steps.vars.outputs.image_file_path }}
         build-args: |
@@ -182,7 +189,7 @@ jobs:
     if: ${{ !failure() }}
     needs: [build, test]
     runs-on: ${{ inputs.runs_on }}
-    
+
     steps:
        - name: Artifact Delete Docker Image
          uses: geekyeggo/delete-artifact@v5
