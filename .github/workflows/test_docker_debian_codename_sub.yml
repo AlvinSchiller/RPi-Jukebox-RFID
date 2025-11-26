@@ -74,9 +74,10 @@ jobs:
         PLATFORM: ${{ inputs.platform }}
       run: |
         PLATFORM=${PLATFORM////_}
-        echo "image_scope=${{ env.DEBIAN_CODENAME }}-${PLATFORM}" >> $GITHUB_OUTPUT
-        echo "image_tag_name=${{ env.DOCKER_IMAGE_NAME }}:${image_scope}" >> $GITHUB_OUTPUT
-        echo "image_file_name=${{ env.DOCKER_IMAGE_NAME }}-${image_scope}.tar" >> $GITHUB_OUTPUT
+        IMAGE_SCOPE=${{ env.DEBIAN_CODENAME }}-${PLATFORM}
+        echo "image_scope=${IMAGE_SCOPE}" >> $GITHUB_OUTPUT
+        echo "image_tag_name=${{ env.DOCKER_IMAGE_NAME }}:${IMAGE_SCOPE}" >> $GITHUB_OUTPUT
+        echo "image_file_name=${{ env.DOCKER_IMAGE_NAME }}-${IMAGE_SCOPE}.tar" >> $GITHUB_OUTPUT
 
 
     - name: Set Output vars
