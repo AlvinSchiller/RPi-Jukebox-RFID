@@ -3,6 +3,7 @@
 # Test to verify that the installation script works as expected.
 # This script needs to be adapted, if new packages, etc are added to the install script
 
+
 # The absolute path to the folder which contains this script
 INSTALLATION_EXITCODE="${1:-0}"
 
