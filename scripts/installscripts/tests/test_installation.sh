@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 # Test to verify that the installation script works as expected.
 # This script needs to be adapted, if new packages, etc are added to the install script
 
