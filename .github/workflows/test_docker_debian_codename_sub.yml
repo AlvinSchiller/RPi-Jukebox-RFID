@@ -109,9 +109,10 @@ jobs:
         target: test-code
         platforms: ${{ inputs.platform }}
         tags: ${{ steps.vars.outputs.image_tag_name_local_base }}
+        # globaler Hauptcache + branch-spezifischer Cache
         cache-from: |
-            type=gha,scope=${{ steps.vars.outputs.cache_base_scope }}     # globaler Hauptcache
-            type=gha,scope=${{ steps.vars.outputs.cache_scope }}          # branch-spezifischer Cache
+            type=gha,scope=${{ steps.vars.outputs.cache_base_scope }}
+            type=gha,scope=${{ steps.vars.outputs.cache_scope }}
         cache-to: type=gha,mode=max,scope=${{ steps.vars.outputs.cache_scope }}
         build-args: |
           DEBIAN_CODENAME=${{ inputs.debian_codename }}
